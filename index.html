@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -31,14 +32,46 @@ var measurement = "NO2 (ppb)";
 // Set the centre of the map
 var centre = [53.69409,-2.1031];
 
-// Setup the map
-var mymap = L.map('mapid').setView(centre, 10);
 
-// This bit loads in your topographic map layer thingy 
-// https://leaflet-extras.github.io/leaflet-providers/preview/
-var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-}).addTo(mymap);
+// Define the possible background tile layers (find more at https://leaflet-extras.github.io/leaflet-providers/preview/)
+var baseMaps = {
+	'Esri World Topo Map': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+	}),
+	'CartoDB': L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+		attribution: 'Tiles: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+		subdomains: 'abcd',
+		maxZoom: 19
+	}),
+	'CartoDB Dark': L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+		attribution: 'Tiles: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+		subdomains: 'abcd',
+		maxZoom: 19
+	}),
+	'National Library of Scotland': L.tileLayer('https://geo.nls.uk/maps/os/1inch_2nd_ed/{z}/{x}/{y}.png', {
+		attribution: 'Tiles: &copy; <a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+		bounds: [[49.6, -12], [61.7, 3]],
+		minZoom: 1,
+		maxZoom: 18,
+		subdomains: '0123'
+	}),
+	'Esri WorldImagery': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+	}),
+	'Hill shading': L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
+		maxZoom: 15,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	})
+}
+		
+
+// Setup the map
+var mymap = L.map('mapid',{'layers':[baseMaps['Esri World Topo Map']]}).setView(centre, 10);
+
+
+// Create background tile selector
+var control = L.control.layers(baseMaps).addTo(mymap);
+
 
 // Add the Geojson Layer
 var geojsonLayer = new L.GeoJSON.AJAX("air-quality-summary.geojson", {
